@@ -98,7 +98,7 @@ app.get('/analyze', async (req, res) => {
       Sex: {
         male: 0,
         female: 0,
-        Other: 0, // In case there are other categories
+        Other: 0,
       },
     };
 
