@@ -26,24 +26,42 @@ const Submissions = () => {
     };
 
     const handleDownload = (url, filename) => {
-        // Get file extension to determine how to handle it
+        // Extract the file extension from the filename
         const fileExtension = filename.split('.').pop().toLowerCase();
+        console.log(`Attempting to download file: ${filename} with extension: ${fileExtension}`);
         
         // Force download for all files by default
         let downloadUrl = url;
         
-        // For Cloudinary URLs, add fl_attachment to force download
+        // For Cloudinary URLs, modify appropriately
         if (url && url.includes('cloudinary.com')) {
+            // Special handling for different file types
             if (['xlsx', 'xls', 'csv'].includes(fileExtension)) {
-                // Excel/CSV files are stored as raw, so the URL should have /raw/upload/
+                // Excel/CSV files are stored as raw
                 if (url.includes('/image/upload/')) {
                     downloadUrl = url.replace('/image/upload/', '/raw/upload/fl_attachment/');
+                } else if (url.includes('/raw/upload/')) {
+                    downloadUrl = url.replace('/raw/upload/', '/raw/upload/fl_attachment/');
                 } else {
                     downloadUrl = url.replace('/upload/', '/upload/fl_attachment/');
                 }
             } else {
-                // For other files
+                // For other files (PDFs, images, etc.)
                 downloadUrl = url.replace('/upload/', '/upload/fl_attachment/');
+            }
+            
+            // Check if the URL already has the extension
+            if (!downloadUrl.endsWith(`.${fileExtension}`)) {
+                // Avoid duplicate extensions by checking if extension is already present
+                if (!downloadUrl.includes(`.${fileExtension}?`)) {
+                    // Add extension before any query params
+                    const urlParts = downloadUrl.split('?');
+                    if (urlParts.length > 1) {
+                        downloadUrl = `${urlParts[0]}.${fileExtension}?${urlParts[1]}`;
+                    } else {
+                        downloadUrl = `${downloadUrl}.${fileExtension}`;
+                    }
+                }
             }
         }
         
@@ -85,6 +103,9 @@ const Submissions = () => {
                                 <h3 className="font-medium mb-2">Uploaded File:</h3>
                                 <p className="text-sm text-gray-500 mb-1">
                                     {submission.file.filename || "Unnamed file"}
+                                </p>
+                                <p className="text-sm text-gray-500 mb-1">
+                                    Type: {submission.file.extension ? submission.file.extension.toUpperCase() : submission.file.contentType.split('/')[1]}
                                 </p>
                                 <p className="text-sm text-gray-500 mb-2">
                                     {(submission.file.size / 1024).toFixed(2)} KB • {new Date(submission.createdAt).toLocaleString()}
