@@ -68,9 +68,22 @@ const Auto = () => {
 
         // Append file
         if (formData.file) {
+            // Check file size before uploading
+            if (formData.file.size > 5 * 1024 * 1024) {
+                setSubmitResult({
+                    success: false,
+                    message: "File size exceeds 5MB limit. Please select a smaller file."
+                });
+                return;
+            }
+            
             data.append("file", formData.file);
+            console.log("File added to form data:", formData.file.name, formData.file.type, formData.file.size);
         } else {
-            alert("Please upload a file");
+            setSubmitResult({
+                success: false,
+                message: "Please upload a file"
+            });
             return;
         }
 
@@ -78,7 +91,8 @@ const Auto = () => {
         setSubmitResult({ success: false, message: "" });
 
         try {
-            // Make POST request to backend server using server1.js endpoint
+            // Make POST request to backend server
+            console.log("Sending request to backend...");
             const response = await axios.post("https://finyearpro-backend1.onrender.com/upload", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -89,6 +103,7 @@ const Auto = () => {
                     );
                     setUploadProgress(percentCompleted);
                 },
+                timeout: 60000 // 60 second timeout
             });
             
             // Show success animation
@@ -125,25 +140,42 @@ const Auto = () => {
             
         } catch (error) {
             console.error("Error submitting the form:", error);
-            let errorMessage = "Failed to submit the form";
+            
+            let errorMessage = "Failed to submit the form. Please try again.";
             
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                errorMessage = error.response.data.message || error.response.data.error || errorMessage;
-                console.error("Error response data:", error.response.data);
+                console.error("Error status:", error.response.status);
+                console.error("Error response data:", JSON.stringify(error.response.data));
+                
+                // Handle specific error responses
+                if (error.response.status === 500) {
+                    errorMessage = "Server error. Please try again later or contact support.";
+                } else if (error.response.status === 413) {
+                    errorMessage = "File is too large. Please upload a smaller file (max 5MB).";
+                } else if (error.response.status === 400) {
+                    errorMessage = "Invalid form data. Please check your inputs.";
+                } else if (error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.response.data && error.response.data.error) {
+                    errorMessage = error.response.data.error;
+                }
             } else if (error.request) {
                 // The request was made but no response was received
-                errorMessage = "No response received from server. Please try again.";
+                console.error("No response received:", error.request);
+                errorMessage = "No response received from server. Please check your internet connection.";
             } else {
-                // Something happened in setting up the request that triggered an Error
-                errorMessage = error.message;
+                // Something happened in setting up the request
+                errorMessage = error.message || "An unexpected error occurred.";
             }
             
             setSubmitResult({ 
                 success: false, 
                 message: errorMessage
             });
+            
+            // Reset progress on error
+            setUploadProgress(0);
+            setFileUploading(false);
         } finally {
             setSubmitting(false);
         }
@@ -245,34 +277,54 @@ const Auto = () => {
 
                 <div className="mb-4">
                     <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-                        Upload File
+                        Upload File (max 5MB)
                     </label>
-                    <input
-                        type="file"
-                        name="file"
-                        required
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={handleFileChange}
-                    />
-                    
-                    {/* Upload Progress Bar */}
-                    {(fileUploading || fileUploaded || uploadProgress > 0) && (
-                        <div className="mt-2">
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                <div 
-                                    className={`h-2.5 rounded-full ${fileUploaded ? 'bg-green-600' : 'bg-blue-600'}`}
-                                    style={{ width: `${uploadProgress}%` }}
-                                ></div>
+                    <div className="mt-1 relative">
+                        <input
+                            type="file"
+                            name="file"
+                            id="file"
+                            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                            required
+                            className="hidden"
+                            onChange={handleFileChange}
+                        />
+                        <label
+                            htmlFor="file"
+                            className={`flex items-center justify-center px-4 py-2 w-full border ${
+                                fileUploaded ? 'border-green-500 bg-green-50' : 'border-gray-300'
+                            } rounded cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        >
+                            {fileUploaded ? (
+                                <span className="text-green-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    {formData.file ? formData.file.name : "File uploaded successfully"}
+                                </span>
+                            ) : fileUploading ? (
+                                <span className="text-blue-600">Uploading... please wait</span>
+                            ) : (
+                                <span className="text-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                    Click to browse files
+                                </span>
+                            )}
+                        </label>
+                        {fileUploading && (
+                            <div className="mt-2">
+                                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
+                                </div>
+                                <p className="text-xs text-center mt-1 text-gray-500">{uploadProgress}% uploaded</p>
                             </div>
-                            <p className="text-xs mt-1 text-gray-500">
-                                {fileUploaded 
-                                    ? 'File uploaded successfully' 
-                                    : fileUploading 
-                                        ? `Uploading: ${Math.round(uploadProgress)}%` 
-                                        : ''}
-                            </p>
-                        </div>
-                    )}
+                        )}
+                        <p className="mt-1 text-xs text-gray-500">
+                            Accepted file types: JPG, JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX (Max 5MB)
+                        </p>
+                    </div>
                 </div>
 
                 <div className="flex justify-end">
