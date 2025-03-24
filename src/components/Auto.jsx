@@ -79,7 +79,7 @@ const Auto = () => {
 
         try {
             // Make POST request to backend server using server1.js endpoint
-            const response = await axios.post("http://localhost:5003/upload", data, {
+            const response = await axios.post("https://finyearpro-backend1.onrender.com/upload", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
