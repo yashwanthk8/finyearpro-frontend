@@ -30,7 +30,7 @@ const Auto = () => {
         if (e.target.files[0]) {
             const file = e.target.files[0];
             
-            // Check file size (now 10MB limit)
+            // Check file size (10MB limit)
             if (file.size > 10 * 1024 * 1024) {
                 setSubmitResult({
                     success: false,
@@ -39,32 +39,22 @@ const Auto = () => {
                 return;
             }
             
-            // Check file type
-            const fileType = file.type;
+            // Check if it's an Excel/CSV file by extension
             const fileName = file.name.toLowerCase();
-            const validExcelTypes = [
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/vnd.oasis.opendocument.spreadsheet'
-            ];
-            
-            // Allow Excel files by checking both MIME type and extension
-            const isExcel = validExcelTypes.includes(fileType) || 
-                           fileName.endsWith('.xlsx') || 
-                           fileName.endsWith('.xls') ||
+            const isExcel = fileName.endsWith('.xlsx') || 
+                           fileName.endsWith('.xls') || 
                            fileName.endsWith('.csv');
-                           
-            if (fileType && !fileType.startsWith('image/') && 
-                !fileType.includes('pdf') && 
-                !fileType.includes('word') && 
-                !isExcel) {
-                
-                setSubmitResult({
-                    success: false,
-                    message: "Unsupported file type. Please upload an image, PDF, Word document, or Excel file."
-                });
-                return;
-            }
+            
+            // Get file type - handle empty MIME types for some Excel files
+            const fileType = file.type || 
+                            (isExcel ? 'application/vnd.ms-excel' : '');
+            
+            console.log("File details:", {
+                name: file.name,
+                type: fileType,
+                size: `${(file.size / 1024).toFixed(2)} KB`,
+                extension: file.name.split('.').pop()
+            });
             
             // Reset any previous error messages
             setSubmitResult({ success: false, message: "" });
@@ -95,13 +85,6 @@ const Auto = () => {
             setFormData({
                 ...formData,
                 file: file,
-            });
-            
-            console.log("File selected:", {
-                name: file.name,
-                type: file.type,
-                size: `${(file.size / 1024).toFixed(2)} KB`,
-                extension: file.name.split('.').pop()
             });
         }
     };

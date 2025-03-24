@@ -26,16 +26,29 @@ const Submissions = () => {
     };
 
     const handleDownload = (url, filename) => {
-        // For PDFs and documents, force download by modifying the Cloudinary URL
-        // Add fl_attachment to the URL to force download
+        // Get file extension to determine how to handle it
+        const fileExtension = filename.split('.').pop().toLowerCase();
+        
+        // Force download for all files by default
+        let downloadUrl = url;
+        
+        // For Cloudinary URLs, add fl_attachment to force download
         if (url && url.includes('cloudinary.com')) {
-            const downloadUrl = url.replace('/upload/', '/upload/fl_attachment/');
-            console.log('Opening download URL:', downloadUrl);
-            window.open(downloadUrl, '_blank');
-        } else {
-            console.log('Opening regular URL:', url);
-            window.open(url, '_blank');
+            if (['xlsx', 'xls', 'csv'].includes(fileExtension)) {
+                // Excel/CSV files are stored as raw, so the URL should have /raw/upload/
+                if (url.includes('/image/upload/')) {
+                    downloadUrl = url.replace('/image/upload/', '/raw/upload/fl_attachment/');
+                } else {
+                    downloadUrl = url.replace('/upload/', '/upload/fl_attachment/');
+                }
+            } else {
+                // For other files
+                downloadUrl = url.replace('/upload/', '/upload/fl_attachment/');
+            }
         }
+        
+        console.log('Opening download URL:', downloadUrl);
+        window.open(downloadUrl, '_blank');
     };
 
     return (
