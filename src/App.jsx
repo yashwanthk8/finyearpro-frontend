@@ -10,6 +10,8 @@ import './index.css'; // or './App.css' if you are using another file for global
 import Auto from './components/Auto';
 import Manual from './components/Manual';
 import WorkAuto from './components/WorkAuto';
+import Submissions from './components/Submissions';
+
 function App() {
   const heroRef = useRef(null);
   const stepwiseRef = useRef(null);
@@ -62,6 +64,7 @@ function App() {
         <Route path="/auto" element={<Auto/>}/>
         <Route path="/manual" element={<Manual/>}/>
         <Route path="/workauto" element={<WorkAuto/>}/>
+        <Route path="/submissions" element={<Submissions/>}/>
       </Routes>
     </Router>
   );
