@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import DataVisualizer from './DataVisualizer';
 const WorkAuto = () => {
   // const [submissions, setSubmissions] = useState([]);
   // const [loading, setLoading] = useState(true);
