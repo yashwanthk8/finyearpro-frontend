@@ -9,11 +9,23 @@ import mongoose from "mongoose";
 const app = express();
 const port = 5003;
 
-// MongoDB connection string
-const dbURI = "mongodb://localhost:27017/yourDatabaseName"; // Replace with your database URL
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("MongoDB connected"))
-    .catch((err) => console.error("Error connecting to MongoDB:", err));
+// MongoDB Atlas connection string
+// To set up MongoDB Atlas:
+// 1. Create a free account at https://www.mongodb.com/cloud/atlas
+// 2. Create a new cluster (the free tier is sufficient)
+// 3. Once the cluster is created, click "Connect" and select "Connect your application"
+// 4. Choose Node.js as your driver and copy the connection string
+// 5. Replace <username>, <password>, <cluster-url>, and <database-name> with your actual credentials
+// Example: mongodb+srv://myuser:mypassword@cluster0.mongodb.net/finyearpro?retryWrites=true&w=majority
+const dbURI = "mongodb+srv://yashwanthk872:yashu2004@finalyearpro.yd8f7.mongodb.net/?retryWrites=true&w=majority&appName=finalYearPro"; 
+
+mongoose.connect(dbURI, { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000 // 5 seconds timeout for server selection
+})
+    .then(() => console.log("MongoDB Atlas connected successfully"))
+    .catch((err) => console.error("Error connecting to MongoDB Atlas:", err));
 
 // MongoDB Schema for File Uploads
 const fileUploadSchema = new mongoose.Schema({
@@ -25,6 +37,7 @@ const fileUploadSchema = new mongoose.Schema({
         filename: { type: String, required: true },
         path: { type: String, required: true },
         size: { type: Number, required: true },
+        contentType: { type: String, required: true } // Added to store file type
     },
 }, { timestamps: true });
 
@@ -72,6 +85,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
         filename: req.file.filename,
         path: req.file.path,
         size: req.file.size,
+        contentType: req.file.mimetype // Save the file type
     };
 
     // Create a new document to store in MongoDB
@@ -84,11 +98,11 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     });
 
     try {
-        // Save the data to MongoDB
+        // Save the data to MongoDB Atlas
         await newFileUpload.save();
 
         const responseData = {
-            message: "File uploaded and data saved successfully",
+            message: "File uploaded and data saved successfully to MongoDB Atlas",
             userDetails: { username, email, phoneCode, phone },
             file: req.file,
         };
@@ -98,8 +112,75 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
         res.status(200).send(responseData);
     } catch (error) {
-        console.error("Error saving to MongoDB:", error);
+        console.error("Error saving to MongoDB Atlas:", error);
         res.status(500).send("Error saving data to database");
+    }
+});
+
+// GET route to retrieve all submissions
+app.get("/submissions", async (req, res) => {
+    try {
+        // Fetch all documents from FileUpload collection
+        const submissions = await FileUpload.find({})
+            .select('-file.path') // Exclude file path for security
+            .sort({ createdAt: -1 }); // Sort by creation date, newest first
+        
+        res.status(200).json({
+            success: true,
+            count: submissions.length,
+            data: submissions
+        });
+    } catch (error) {
+        console.error("Error fetching submissions:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching submissions",
+            error: error.message
+        });
+    }
+});
+
+// GET route to download a specific file by filename
+app.get("/download/:filename", async (req, res) => {
+    try {
+        const { filename } = req.params;
+        
+        // Find the file record in the database
+        const fileRecord = await FileUpload.findOne({ "file.filename": filename });
+        
+        if (!fileRecord) {
+            return res.status(404).json({
+                success: false,
+                message: "File not found"
+            });
+        }
+        
+        // Construct the file path
+        const filePath = path.join(__dirname, "uploads", filename);
+        
+        // Check if file exists
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({
+                success: false,
+                message: "File not found on server"
+            });
+        }
+        
+        // Set content type and send the file
+        res.setHeader('Content-Type', fileRecord.file.contentType);
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        
+        // Create read stream and pipe to response
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
+        
+    } catch (error) {
+        console.error("Error downloading file:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error downloading file",
+            error: error.message
+        });
     }
 });
 
