@@ -28,6 +28,48 @@ const Auto = () => {
 
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            // Check file size (now 10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                setSubmitResult({
+                    success: false,
+                    message: "File size exceeds 10MB limit. Please select a smaller file."
+                });
+                return;
+            }
+            
+            // Check file type
+            const fileType = file.type;
+            const fileName = file.name.toLowerCase();
+            const validExcelTypes = [
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.oasis.opendocument.spreadsheet'
+            ];
+            
+            // Allow Excel files by checking both MIME type and extension
+            const isExcel = validExcelTypes.includes(fileType) || 
+                           fileName.endsWith('.xlsx') || 
+                           fileName.endsWith('.xls') ||
+                           fileName.endsWith('.csv');
+                           
+            if (fileType && !fileType.startsWith('image/') && 
+                !fileType.includes('pdf') && 
+                !fileType.includes('word') && 
+                !isExcel) {
+                
+                setSubmitResult({
+                    success: false,
+                    message: "Unsupported file type. Please upload an image, PDF, Word document, or Excel file."
+                });
+                return;
+            }
+            
+            // Reset any previous error messages
+            setSubmitResult({ success: false, message: "" });
+            
+            // Start upload progress simulation
             setFileUploading(true);
             setFileUploaded(false);
             setUploadProgress(0);
@@ -49,9 +91,17 @@ const Auto = () => {
             
             simulateUpload();
             
+            // Update form data with file
             setFormData({
                 ...formData,
-                file: e.target.files[0],
+                file: file,
+            });
+            
+            console.log("File selected:", {
+                name: file.name,
+                type: file.type,
+                size: `${(file.size / 1024).toFixed(2)} KB`,
+                extension: file.name.split('.').pop()
             });
         }
     };
@@ -69,10 +119,10 @@ const Auto = () => {
         // Append file
         if (formData.file) {
             // Check file size before uploading
-            if (formData.file.size > 5 * 1024 * 1024) {
+            if (formData.file.size > 10 * 1024 * 1024) {
                 setSubmitResult({
                     success: false,
-                    message: "File size exceeds 5MB limit. Please select a smaller file."
+                    message: "File size exceeds 10MB limit. Please select a smaller file."
                 });
                 return;
             }
@@ -93,6 +143,12 @@ const Auto = () => {
         try {
             // Make POST request to backend server
             console.log("Sending request to backend...");
+            console.log("File being sent:", {
+                name: formData.file.name,
+                type: formData.file.type,
+                size: formData.file.size
+            });
+            
             const response = await axios.post("https://finyearpro-backend1.onrender.com/upload", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -101,9 +157,10 @@ const Auto = () => {
                     const percentCompleted = Math.round(
                         (progressEvent.loaded * 100) / progressEvent.total
                     );
+                    console.log(`Upload progress: ${percentCompleted}%`);
                     setUploadProgress(percentCompleted);
                 },
-                timeout: 60000 // 60 second timeout
+                timeout: 120000 // 2 minute timeout for larger files
             });
             
             // Show success animation
@@ -151,9 +208,13 @@ const Auto = () => {
                 if (error.response.status === 500) {
                     errorMessage = "Server error. Please try again later or contact support.";
                 } else if (error.response.status === 413) {
-                    errorMessage = "File is too large. Please upload a smaller file (max 5MB).";
+                    errorMessage = "File is too large. Please upload a smaller file (max 10MB).";
                 } else if (error.response.status === 400) {
-                    errorMessage = "Invalid form data. Please check your inputs.";
+                    if (error.response.data && error.response.data.message) {
+                        errorMessage = error.response.data.message;
+                    } else {
+                        errorMessage = "Invalid form data. Please check your inputs and file format.";
+                    }
                 } else if (error.response.data && error.response.data.message) {
                     errorMessage = error.response.data.message;
                 } else if (error.response.data && error.response.data.error) {
@@ -277,14 +338,14 @@ const Auto = () => {
 
                 <div className="mb-4">
                     <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-                        Upload File (max 5MB)
+                        Upload File (max 10MB)
                     </label>
                     <div className="mt-1 relative">
                         <input
                             type="file"
                             name="file"
                             id="file"
-                            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.csv"
                             required
                             className="hidden"
                             onChange={handleFileChange}
@@ -322,7 +383,7 @@ const Auto = () => {
                             </div>
                         )}
                         <p className="mt-1 text-xs text-gray-500">
-                            Accepted file types: JPG, JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX (Max 5MB)
+                            Accepted file types: JPG, JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX, CSV (Max 10MB)
                         </p>
                     </div>
                 </div>
