@@ -97,7 +97,7 @@ const Auto = () => {
             setTimeout(() => {
                 setSubmitResult({ 
                     success: true, 
-                    message: "Form submitted successfully! Data saved to MongoDB Atlas." 
+                    message: response.data.message || "Form submitted successfully! Data saved to MongoDB Atlas." 
                 });
                 
                 // Reset form after successful submission
@@ -121,13 +121,28 @@ const Auto = () => {
                 
             }, 1000);
             
-            console.log(response.data);
+            console.log("Server response:", response.data);
             
         } catch (error) {
-            console.error("Error submitting the form", error);
+            console.error("Error submitting the form:", error);
+            let errorMessage = "Failed to submit the form";
+            
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                errorMessage = error.response.data.message || error.response.data.error || errorMessage;
+                console.error("Error response data:", error.response.data);
+            } else if (error.request) {
+                // The request was made but no response was received
+                errorMessage = "No response received from server. Please try again.";
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                errorMessage = error.message;
+            }
+            
             setSubmitResult({ 
                 success: false, 
-                message: `Failed to submit the form: ${error.response?.data || error.message}` 
+                message: errorMessage
             });
         } finally {
             setSubmitting(false);
