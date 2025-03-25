@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Import React Router components
+import FileChat from './components/FileChat';
 import Navbarm from './components/Navbarm';
 import HeroSec from './components/HeroSec';
 import StepWise from './components/StepWise';
@@ -66,6 +67,7 @@ function App() {
         <Route path="/workauto" element={<WorkAuto/>}/>
         <Route path="/submissions" element={<Submissions/>}/>
       </Routes>
+      <FileChat />
     </Router>
   );
 }
