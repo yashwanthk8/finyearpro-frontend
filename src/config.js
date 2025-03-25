@@ -14,7 +14,7 @@ export const FEATURES = {
 export const API_CONFIG = {
   geminiModel: "gemini-pro",      // Using the free tier model
   maxTokens: 2048,                // Reduced max tokens for free tier
-  apiVersion: "v1",               // API version (v1 is current stable version)
+  apiVersion: "v1beta",           // API version (v1beta for gemini-pro)
   maxRequestsPerDay: 45,          // Slightly below free tier limit for safety
   retryDelay: 60000,              // 60 seconds (1 minute) retry delay
 };
