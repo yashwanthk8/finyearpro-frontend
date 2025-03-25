@@ -96,10 +96,18 @@ const FileChat = () => {
         content: answer 
       }]);
     } catch (error) {
-      setMessages(prev => [...prev, { 
-        type: 'bot', 
-        content: `Sorry, I encountered an error: ${error.message}` 
-      }]);
+      // Handle rate limit errors specifically
+      if (error.message.includes("429") || error.message.includes("quota")) {
+        setMessages(prev => [...prev, { 
+          type: 'bot', 
+          content: `You've reached the daily limit for free API calls. Please wait a few minutes before trying again. You can still use the basic file analysis features.` 
+        }]);
+      } else {
+        setMessages(prev => [...prev, { 
+          type: 'bot', 
+          content: `Sorry, I encountered an error: ${error.message}` 
+        }]);
+      }
     } finally {
       setLoading(false);
     }

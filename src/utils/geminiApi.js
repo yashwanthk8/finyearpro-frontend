@@ -6,6 +6,31 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY, {
   apiVersion: API_CONFIG.apiVersion
 });
 
+// Track API usage
+let requestCount = 0;
+let lastRequestTime = Date.now();
+
+/**
+ * Check if we've hit the rate limit
+ */
+function checkRateLimit() {
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastRequestTime;
+  
+  // If we've made too many requests, wait for the retry delay
+  if (requestCount >= API_CONFIG.maxRequestsPerDay) {
+    const waitTime = API_CONFIG.retryDelay - timeSinceLastRequest;
+    if (waitTime > 0) {
+      throw new Error(`Rate limit reached. Please wait ${Math.ceil(waitTime / 1000)} seconds before trying again.`);
+    }
+    // Reset counter if enough time has passed
+    requestCount = 0;
+  }
+  
+  lastRequestTime = now;
+  requestCount++;
+}
+
 /**
  * Get a response from Gemini based on the document content and user question
  * 
@@ -16,6 +41,9 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY, {
  */
 export async function getGeminiResponse(fileContent, question, fileName) {
   try {
+    // Check rate limits before making the request
+    checkRateLimit();
+    
     // For very large files, consider truncating content
     const truncatedContent = fileContent.length > fileConfig.maxContentLength 
       ? fileContent.substring(0, fileConfig.maxContentLength) + "... [content truncated due to length]"
@@ -58,6 +86,12 @@ export async function getGeminiResponse(fileContent, question, fileName) {
     return text;
   } catch (error) {
     console.error("Error calling Gemini API:", error);
+    
+    // Handle rate limit errors specifically
+    if (error.message.includes("429") || error.message.includes("quota")) {
+      return `You've reached the daily limit for free API calls. Please wait ${Math.ceil(API_CONFIG.retryDelay / 1000)} seconds before trying again.`;
+    }
+    
     return `Sorry, I encountered an error while analyzing your document: ${error.message}. Please make sure you have a valid Gemini API key configured.`;
   }
 }
