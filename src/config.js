@@ -3,7 +3,7 @@
 
 // Gemini API Key
 // Replace with your actual API key from Google AI Studio: https://aistudio.google.com/
-export const GEMINI_API_KEY = "AIzaSyByzc8RoM701gfWAfvX1_yNOOWWqWzTYFU";
+export const GEMINI_API_KEY = "AIzaSyAmNKXKfaMtoaVCLcFfp-_4jR2tImLGzEU";
 
 // Feature flags
 export const FEATURES = {
@@ -12,11 +12,11 @@ export const FEATURES = {
 
 // API settings
 export const API_CONFIG = {
-  geminiModel: "gemini-flash",    // Using the flash model for better compatibility
-  maxTokens: 2048,                // Reduced max tokens for free tier
-  apiVersion: "v1",               // API version (v1 for flash model)
-  maxRequestsPerDay: 45,          // Slightly below free tier limit for safety
-  retryDelay: 60000,              // 60 seconds (1 minute) retry delay
+  geminiModel: "gemini-2.0-flash",  // Using the gemini-2.0-flash model 
+  maxTokens: 2048,                  // Reduced max tokens for free tier
+  apiVersion: "v1",                 // API version (v1 is the current stable version)
+  maxRequestsPerDay: 45,            // Slightly below free tier limit for safety
+  retryDelay: 60000,                // 60 seconds (1 minute) retry delay
 };
 
 // File processing settings
