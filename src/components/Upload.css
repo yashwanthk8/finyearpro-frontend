@@ -15,14 +15,16 @@ body {
     display: flex;
     height: 100vh;
     width: 100vw;
+    flex-direction: row;
 }
 
 .split-section {
     height: 100%;
     width: 100%;
     position: relative;
-    transition: all 1s;
-    /*    background-size: cover;*/
+    transition: all 0.8s ease;
+    background-size: cover;
+    background-position: center;
 }
 
 #split-1 {
@@ -95,4 +97,42 @@ body {
 .btn-outline-white:hover {
     background-color: #fff;
     color: #000;
+}
+
+/* Mobile responsive styles */
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .split-section {
+        height: 50vh;
+        width: 100% !important; /* Override hover effect */
+    }
+    
+    .split-section:hover {
+        width: 100% !important;
+        height: 60vh;
+    }
+    
+    .split-heading-main {
+        font-size: 24px;
+        letter-spacing: 5px;
+    }
+    
+    .split-heading-sub {
+        font-size: 16px;
+        letter-spacing: 8px;
+    }
+    
+    .btn:link, 
+    .btn:visited {
+        padding: 5px 15px;
+        font-size: 14px;
+        letter-spacing: 3px;
+    }
+    
+    .btn:hover {
+        padding: 5px 25px;
+    }
 }

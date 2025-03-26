@@ -248,4 +248,53 @@
     height: 50px;
     font-size: 20px;
   }
+}
+
+/* Welcome bubble styling */
+.welcome-bubble {
+  position: absolute;
+  bottom: -10px;
+  right:  70px;
+  background-color: #000000;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 250px;
+  font-size: 14px;
+  line-height: 1.4;
+  z-index: 999;
+  /* animation: fadeInOut 6s ease-in-out forwards; */
+  font-weight: 500;
+}
+
+.welcome-bubble::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid #000000;
+  transform: translateY(-50%);
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-20px); }
+  10% { opacity: 1; transform: translateX(0); }
+  85% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-10px); }
+}
+
+/* Mobile responsive styles for the welcome bubble */
+@media screen and (max-width: 768px) {
+  .welcome-bubble {
+    bottom: -10px;
+    right: 70px;
+    max-width: 200px;
+    font-size: 12px;
+    padding: 8px 12px;
+  }
 } 

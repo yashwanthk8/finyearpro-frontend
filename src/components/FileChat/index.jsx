@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import './FileChat.css';
 import { parseFileContent } from '../../utils/fileParser';
 import { getGeminiResponse, isProcessableFile } from '../../utils/geminiApi';
@@ -9,6 +10,8 @@ import { FEATURES } from '../../config';
  */
 const FileChat = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
+  const [showWelcomeBubble, setShowWelcomeBubble] = useState(false);
   const [messages, setMessages] = useState([
     { type: 'bot', content: 'Hello! Upload a document and ask me questions about it using Google\'s Gemini AI.' }
   ]);
@@ -17,6 +20,8 @@ const FileChat = () => {
   const [fileName, setFileName] = useState('');
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const location = useLocation();
   
   // Ref for auto-scrolling the chat
   const messagesEndRef = useRef(null);
@@ -29,9 +34,35 @@ const FileChat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+  
+  // Show temporary welcome bubble on home page
+  useEffect(() => {
+    // Check if we're on the home page
+    if (location.pathname === '/' && !hasShownWelcome) {
+      // Wait 1 second before showing the welcome bubble
+      const showTimer = setTimeout(() => {
+        setShowWelcomeBubble(true);
+        setHasShownWelcome(true);
+      }, 1000);
+      
+      // Hide the bubble after exactly 6 seconds
+      const hideTimer = setTimeout(() => {
+        setShowWelcomeBubble(false);
+      }, 7000); // 1s delay + 6s display
+      
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [location.pathname, hasShownWelcome]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
+    // Hide the welcome bubble when chat is opened
+    if (!isOpen) {
+      setShowWelcomeBubble(false);
+    }
   };
 
   const handleFileUpload = async (event) => {
@@ -135,6 +166,13 @@ const FileChat = () => {
 
   return (
     <div className="file-chat-container">
+      {/* Welcome message bubble */}
+      {showWelcomeBubble && (
+        <div className="welcome-bubble">
+          Upload documents & I'll answer questions! 📄
+        </div>
+      )}
+      
       {/* Chat toggle button */}
       <button 
         className="file-chat-button"
