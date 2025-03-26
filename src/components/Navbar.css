@@ -57,3 +57,37 @@ body{
   color: cyan;
   cursor: pointer
 }
+
+/* Mobile styles */
+.menu-btn {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .menu-btn {
+    display: block;
+    margin-right: 5vw;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .first ul {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: white;
+    flex-direction: column;
+    padding: 20px 0;
+    text-align: center;
+  }
+  
+  .first ul.show {
+    display: flex;
+  }
+  
+  .first li {
+    padding: 10px 0;
+  }
+}
