@@ -89,10 +89,10 @@ const Footer = () => {
             &copy; {year} All Rights Reserved | Yashwanth Kumar
           </p>
           <div className="mt-4 md:mt-0 flex space-x-6">
-            <a href="/docs/terms-of-service.pdf.html" target="_blank" className="text-gray-300 hover:text-white text-sm transition">
+            <a href="/docs/terms-of-service.html" target="_blank" className="text-gray-300 hover:text-white text-sm transition">
               Terms of Service
             </a>
-            <a href="/docs/privacy-policy.pdf.html" target="_blank" className="text-gray-300 hover:text-white text-sm transition">
+            <a href="/docs/privacy-policy.html" target="_blank" className="text-gray-300 hover:text-white text-sm transition">
               Privacy Policy
             </a>
             <Link to="/contact" className="text-gray-300 hover:text-white text-sm transition">
