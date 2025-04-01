@@ -4,6 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "22.10.0"
+  NPM_FLAGS = "--legacy-peer-deps"
+  VITE_DISABLE_ESLINT_PLUGIN = "true"
+  NETLIFY_USE_YARN = "false"
 
 # Handle SPA routing for React Router
 [[redirects]]
