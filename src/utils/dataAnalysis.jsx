@@ -4,12 +4,27 @@ import { TrendingUp, AlertTriangle, Info, BarChart2 } from 'lucide-react';
 
 // Statistical Analysis
 export const performStatisticalAnalysis = (data, selectedXColumn, selectedYColumn) => {
+  // Add safety checks for data type
   if (!data || !selectedXColumn || !selectedYColumn) return null;
+  
+  // Ensure data is always treated as an array
+  const dataArray = Array.isArray(data) ? data : [];
+  
+  if (dataArray.length === 0) return null;
 
-  const numericData = data.map(item => [
+  // Check if data has the selected columns
+  if (!dataArray[0].hasOwnProperty(selectedXColumn) || !dataArray[0].hasOwnProperty(selectedYColumn)) {
+    console.error('Selected columns not found in data:', { selectedXColumn, selectedYColumn, data: dataArray[0] });
+    return null;
+  }
+
+  const numericData = dataArray.map(item => [
     parseFloat(item[selectedXColumn]), 
     parseFloat(item[selectedYColumn])
   ]).filter(pair => !isNaN(pair[0]) && !isNaN(pair[1]));
+  
+  // If no valid numeric data after filtering, return null
+  if (numericData.length === 0) return null;
 
   // Calculate quartiles for better distribution understanding
   const sortedYValues = [...numericData.map(d => d[1])].sort((a, b) => a - b);
@@ -82,22 +97,29 @@ export const performStatisticalAnalysis = (data, selectedXColumn, selectedYColum
 
 // Time Series Analysis
 export const performTimeSeriesAnalysis = (data, columns, selectedXColumn, selectedYColumn) => {
+  // Add safety checks for data type
   if (!data || !selectedXColumn || !selectedYColumn) return null;
+  
+  // Ensure data is always treated as an array
+  const dataArray = Array.isArray(data) ? data : [];
+  const columnsArray = Array.isArray(columns) ? columns : [];
+  
+  if (dataArray.length === 0 || columnsArray.length === 0) return null;
 
   const isDateColumn = (column) => {
-    return data.some(item => !isNaN(Date.parse(item[column])));
+    return dataArray.some(item => !isNaN(Date.parse(item[column])));
   };
 
   // Try to find date column
-  const dateColumn = columns.find(isDateColumn) || selectedXColumn;
+  const dateColumn = columnsArray.find(isDateColumn) || selectedXColumn;
   if (!dateColumn) return null;
 
   // Check if the selected X column can be parsed as dates
-  const canParseAsDates = data.every(item => !isNaN(Date.parse(item[dateColumn])));
+  const canParseAsDates = dataArray.every(item => !isNaN(Date.parse(item[dateColumn])));
   
   if (!canParseAsDates) return null;
 
-  const sortedData = [...data].sort((a, b) => 
+  const sortedData = [...dataArray].sort((a, b) => 
     new Date(a[dateColumn]) - new Date(b[dateColumn])
   );
 
@@ -199,11 +221,17 @@ export const performTimeSeriesAnalysis = (data, columns, selectedXColumn, select
 export const predictFutureValues = (data, selectedXColumn, selectedYColumn, statisticalAnalysis) => {
   if (!statisticalAnalysis?.linearRegression || !data || !selectedXColumn || !selectedYColumn) return null;
   
+  // Ensure data is always treated as an array
+  const dataArray = Array.isArray(data) ? data : [];
+  if (dataArray.length === 0) return null;
+  
   const { linearRegression } = statisticalAnalysis;
   const { m, b } = linearRegression;
   
   // Get X values and find the max
-  const xValues = data.map(item => parseFloat(item[selectedXColumn])).filter(x => !isNaN(x));
+  const xValues = dataArray.map(item => parseFloat(item[selectedXColumn])).filter(x => !isNaN(x));
+  if (xValues.length === 0) return null;
+  
   const maxX = Math.max(...xValues);
   
   // Generate 5 future points
