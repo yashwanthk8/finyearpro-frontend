@@ -10,45 +10,27 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true
     },
+    // Simplify for Netlify compatibility
     rollupOptions: {
-      external: [
-        '@fortawesome/fontawesome-svg-core',
-        '@fortawesome/free-solid-svg-icons',
-        '@fortawesome/free-regular-svg-icons',
-        '@fortawesome/free-brands-svg-icons'
-      ],
       output: {
-        globals: {
-          '@fortawesome/fontawesome-svg-core': 'FontAwesomeCore',
-          '@fortawesome/free-solid-svg-icons': 'FontAwesomeSolid',
-          '@fortawesome/free-regular-svg-icons': 'FontAwesomeRegular',
-          '@fortawesome/free-brands-svg-icons': 'FontAwesomeBrands'
-        },
-        manualChunks: {
-          vendor: [
-            'react', 
-            'react-dom', 
-            'react-router-dom'
-          ],
-          lottie: ['lottie-web', 'lottie-react']
+        manualChunks(id) {
+          // Create a vendor chunk for React
+          if (id.includes('node_modules/react') || 
+              id.includes('node_modules/react-dom') || 
+              id.includes('node_modules/react-router-dom')) {
+            return 'vendor';
+          }
+          // Create a chunk for lottie-related code
+          if (id.includes('node_modules/lottie')) {
+            return 'lottie';
+          }
         }
       }
     },
-    minify: 'terser',
-    terserOptions: {
-      parse: {
-        // Workaround for lottie-web eval usage
-        bare_returns: false
-      },
-      compress: {
-        // Disable eval warnings in console but allow them to work
-        passes: 2,
-        drop_console: false,
-        ecma: 2020
-      }
-    },
-    // Allow eval usage in lottie-web
-    sourcemap: false
+    // Increase warning limit to avoid non-zero exit codes for large chunks
+    chunkSizeWarningLimit: 2000,
+    // Less aggressive minification
+    minify: 'esbuild'
   },
   resolve: {
     alias: {

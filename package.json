@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,6 +15,10 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@google/generative-ai": "^0.24.0",
     "@supabase/supabase-js": "^2.49.3",
     "antd": "^5.23.2",
@@ -25,6 +33,7 @@
     "date-fns": "^4.1.0",
     "express": "^4.21.2",
     "flowbite": "^2.5.2",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.474.0",
     "mongoose": "^8.8.4",
     "multer": "^1.4.5-lts.1",
@@ -54,6 +63,7 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
+    "terser": "^5.28.1",
     "vite": "^5.4.8"
   },
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
