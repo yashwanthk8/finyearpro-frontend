@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import FileChat from './components/FileChat';
 import Navbarm from './components/Navbarm';
@@ -18,20 +18,15 @@ import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import AnalysisDetails from './components/Analysis/AnalysisDetails';
 import DebugTool from './components/Dashboard/DebugTool';
+import Footer from './components/Footer';
+import ContactUs from './components/ContactUs';
 
 // Debug page component
 const DebugPage = () => {
-  const navigate = useNavigate();
-  
-  const handleAnalysisCreated = () => {
-    // Navigate to Dashboard's analyses tab
-    navigate('/dashboard', { state: { activeTab: 'analyses' } });
-  };
-  
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Debug Page</h1>
-      <DebugTool refreshData={handleAnalysisCreated} />
+      <DebugTool />
       <div className="mt-4">
         <Link to="/dashboard" className="text-blue-600 hover:underline">
           Return to Dashboard
@@ -102,6 +97,7 @@ function AppContent() {
               <br />
               <hr className="responsive-line" />
               <div ref={benefitsRef}><Benfits /></div>
+              <Footer />
             </>
           }
         />
@@ -109,54 +105,81 @@ function AppContent() {
         {/* Authentication routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Contact Us route */}
+        <Route path="/contact" element={<ContactUs />} />
         
         {/* Protected routes */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <Dashboard />
+            <>
+              <Dashboard />
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
         
         <Route path="/upload" element={
           <ProtectedRoute>
-            <UploadPage />
+            <>
+              <UploadPage />
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
         
         <Route path="/auto" element={
           <ProtectedRoute>
-            <Auto/>
+            <>
+              <Auto/>
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
         
         <Route path="/manual" element={
           <ProtectedRoute>
-            <Manual/>
+            <>
+              <Manual/>
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
         
         <Route path="/workauto" element={
           <ProtectedRoute>
-            <WorkAuto/>
+            <>
+              <WorkAuto/>
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
         
         <Route path="/submissions" element={
           <ProtectedRoute>
-            <Submissions/>
+            <>
+              <Submissions/>
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
         
         <Route path="/analysis/:id" element={
           <ProtectedRoute>
-            <AnalysisDetails />
+            <>
+              <AnalysisDetails />
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
         
         {/* Debug route */}
         <Route path="/debug" element={
           <ProtectedRoute>
-            <DebugPage />
+            <>
+              <DebugPage />
+              <Footer />
+            </>
           </ProtectedRoute>
         } />
       </Routes>
