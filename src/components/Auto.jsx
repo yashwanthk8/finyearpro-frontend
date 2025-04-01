@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { uploadDocumentMetadata } from "../supabase";
+import Navbarm from "./Navbarm";
 
 const Auto = () => {
     const { user } = useAuth();
@@ -20,6 +21,12 @@ const Auto = () => {
     const [fileUploading, setFileUploading] = useState(false);
     const [fileUploaded, setFileUploaded] = useState(false);
     const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+
+    // Create empty refs for the Navbarm component
+    const heroRef = useRef(null);
+    const stepwiseRef = useRef(null);
+    const featuresRef = useRef(null);
+    const benefitsRef = useRef(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -220,173 +227,179 @@ const Auto = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-md p-6 bg-white rounded-lg shadow-md relative"
-            >
-                {/* Success Animation Overlay */}
-                {showSuccessAnimation && (
-                    <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10 rounded-lg">
-                        <div className="text-center">
-                            <div className="success-checkmark">
-                                <div className="check-icon">
-                                    <span className="icon-line line-tip"></span>
-                                    <span className="icon-line line-long"></span>
-                                    <div className="icon-circle"></div>
-                                    <div className="icon-fix"></div>
+        <>
+            <Navbarm 
+                scrollToSection={() => {}} 
+                sections={{ heroRef, stepwiseRef, featuresRef, benefitsRef }} 
+            />
+            <div className="flex items-center justify-center min-h-screen bg-gray-100 pt-16">
+                <form
+                    onSubmit={handleSubmit}
+                    className="w-full max-w-md p-6 bg-white rounded-lg shadow-md relative"
+                >
+                    {/* Success Animation Overlay */}
+                    {showSuccessAnimation && (
+                        <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10 rounded-lg">
+                            <div className="text-center">
+                                <div className="success-checkmark">
+                                    <div className="check-icon">
+                                        <span className="icon-line line-tip"></span>
+                                        <span className="icon-line line-long"></span>
+                                        <div className="icon-circle"></div>
+                                        <div className="icon-fix"></div>
+                                    </div>
                                 </div>
+                                <p className="text-lg font-medium text-green-600 mt-4">Successfully Submitted!</p>
                             </div>
-                            <p className="text-lg font-medium text-green-600 mt-4">Successfully Submitted!</p>
+                        </div>
+                    )}
+                    
+                    <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                        Submit Your Information
+                    </h2>
+
+                    {submitResult.message && !showSuccessAnimation && (
+                        <div className={`mb-4 p-3 rounded ${submitResult.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {submitResult.message}
+                        </div>
+                    )}
+
+                    <div className="mb-4">
+                        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                            Name
+                        </label>
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Enter Name"
+                            required
+                            value={formData.username}
+                            className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter Email"
+                            required
+                            value={formData.email}
+                            className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="mb-4 grid grid-cols-4 gap-2">
+                        <div className="col-span-1">
+                            <label htmlFor="phoneCode" className="block text-sm font-medium text-gray-700">
+                                Code
+                            </label>
+                            <input
+                                type="text"
+                                name="phoneCode"
+                                placeholder="+91"
+                                required
+                                value={formData.phoneCode}
+                                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="col-span-3">
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                                Phone Number
+                            </label>
+                            <input
+                                type="text"
+                                name="phone"
+                                placeholder="Enter Phone Number"
+                                required
+                                value={formData.phone}
+                                className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={handleChange}
+                            />
                         </div>
                     </div>
-                )}
-                
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-                    Submit Your Information
-                </h2>
 
-                {submitResult.message && !showSuccessAnimation && (
-                    <div className={`mb-4 p-3 rounded ${submitResult.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {submitResult.message}
-                    </div>
-                )}
-
-                <div className="mb-4">
-                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        name="username"
-                        placeholder="Enter Name"
-                        required
-                        value={formData.username}
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Enter Email"
-                        required
-                        value={formData.email}
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div className="mb-4 grid grid-cols-4 gap-2">
-                    <div className="col-span-1">
-                        <label htmlFor="phoneCode" className="block text-sm font-medium text-gray-700">
-                            Code
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Upload File
                         </label>
-                        <input
-                            type="text"
-                            name="phoneCode"
-                            placeholder="+91"
-                            required
-                            value={formData.phoneCode}
-                            className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div className="col-span-3">
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                            Phone Number
-                        </label>
-                        <input
-                            type="text"
-                            name="phone"
-                            placeholder="Enter Phone Number"
-                            required
-                            value={formData.phone}
-                            className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            onChange={handleChange}
-                        />
-                    </div>
-                </div>
+                        <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+                            <input
+                                type="file"
+                                name="file"
+                                className="hidden"
+                                id="file-upload"
+                                onChange={handleFileChange}
+                                required
+                            />
+                            <label
+                                htmlFor="file-upload"
+                                className="flex flex-col items-center justify-center text-sm text-gray-500 cursor-pointer"
+                            >
+                                {fileUploaded ? (
+                                    <span className="text-green-600 mt-2">
+                                        ✓ {formData.file.name} ({Math.round(formData.file.size / 1024)} KB)
+                                    </span>
+                                ) : (
+                                    <>
+                                        <svg
+                                            className="h-10 w-10 text-gray-400"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                            />
+                                        </svg>
+                                        <span className="mt-2">Click to upload or drag and drop</span>
+                                    </>
+                                )}
+                            </label>
 
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Upload File
-                    </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
-                        <input
-                            type="file"
-                            name="file"
-                            className="hidden"
-                            id="file-upload"
-                            onChange={handleFileChange}
-                            required
-                        />
-                        <label
-                            htmlFor="file-upload"
-                            className="flex flex-col items-center justify-center text-sm text-gray-500 cursor-pointer"
-                        >
-                            {fileUploaded ? (
-                                <span className="text-green-600 mt-2">
-                                    ✓ {formData.file.name} ({Math.round(formData.file.size / 1024)} KB)
-                                </span>
-                            ) : (
-                                <>
-                                    <svg
-                                        className="h-10 w-10 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                        />
-                                    </svg>
-                                    <span className="mt-2">Click to upload or drag and drop</span>
-                                </>
-                            )}
-                        </label>
-
-                        {fileUploading && (
-                            <div className="mt-4">
-                                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div
-                                        className="bg-blue-600 h-2.5 rounded-full"
-                                        style={{ width: `${uploadProgress}%` }}
-                                    ></div>
+                            {fileUploading && (
+                                <div className="mt-4">
+                                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div
+                                            className="bg-blue-600 h-2.5 rounded-full"
+                                            style={{ width: `${uploadProgress}%` }}
+                                        ></div>
+                                    </div>
+                                    <p className="text-xs text-center mt-1">
+                                        {uploadProgress}% - Processing file...
+                                    </p>
                                 </div>
-                                <p className="text-xs text-center mt-1">
-                                    {uploadProgress}% - Processing file...
-                                </p>
-                            </div>
-                        )}
-                        <p className="mt-1 text-xs text-gray-500">
-                            Accepted file types: JPG, JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX, CSV (Max 10MB)
-                        </p>
+                            )}
+                            <p className="mt-1 text-xs text-gray-500">
+                                Accepted file types: JPG, JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX, CSV (Max 10MB)
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        disabled={submitting || !fileUploaded || !formData.file}
-                        className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            submitting || !fileUploaded || !formData.file
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-blue-500 hover:bg-blue-600'
-                        }`}
-                    >
-                        {submitting ? 'Submitting...' : 'Submit'}
-                    </button>
-                </div>
-            </form>
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            disabled={submitting || !fileUploaded || !formData.file}
+                            className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                submitting || !fileUploaded || !formData.file
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-blue-500 hover:bg-blue-600'
+                            }`}
+                        >
+                            {submitting ? 'Submitting...' : 'Submit'}
+                        </button>
+                    </div>
+                </form>
+            </div>
             
             {/* CSS for success animation */}
             <style jsx>{`
@@ -544,7 +557,7 @@ const Auto = () => {
                     }
                 }
             `}</style>
-        </div>
+        </>
     );
 };
 

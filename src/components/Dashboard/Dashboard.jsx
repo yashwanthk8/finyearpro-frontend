@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserDocuments, getWorkAutoDocuments, signOut } from '../../supabase';
+import Navbarm from '../Navbarm';
 import DocumentList from './DocumentList';
 
 const Dashboard = () => {
@@ -14,6 +15,12 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('documents');
   const [lastRefresh, setLastRefresh] = useState(new Date());
+  
+  // Create empty refs for the Navbarm component (not used in Dashboard, but required by the component)
+  const heroRef = useRef(null);
+  const stepwiseRef = useRef(null);
+  const featuresRef = useRef(null);
+  const benefitsRef = useRef(null);
 
   // Check for activeTab state from navigation
   useEffect(() => {
@@ -115,25 +122,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Financial Document Analyzer</h1>
-          <div className="flex items-center">
-            {user && (
-              <div className="flex items-center">
-                <span className="mr-4 text-gray-600">{user.email}</span>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      {/* Navbar */}
+      <Navbarm 
+        scrollToSection={() => {}} 
+        sections={{ heroRef, stepwiseRef, featuresRef, benefitsRef }} 
+      />
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
