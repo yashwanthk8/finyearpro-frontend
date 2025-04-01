@@ -9,6 +9,24 @@ export default defineConfig({
   build: {
     commonjsOptions: {
       transformMixedEsModules: true
+    },
+    rollupOptions: {
+      external: [],
+      output: {
+        manualChunks: {
+          fontawesome: [
+            '@fortawesome/fontawesome-svg-core',
+            '@fortawesome/free-solid-svg-icons',
+            '@fortawesome/free-regular-svg-icons',
+            '@fortawesome/free-brands-svg-icons'
+          ],
+          vendor: [
+            'react', 
+            'react-dom', 
+            'react-router-dom'
+          ]
+        }
+      }
     }
   },
   resolve: {
