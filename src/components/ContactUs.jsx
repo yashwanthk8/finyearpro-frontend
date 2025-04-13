@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Navbarm from './Navbarm';
 
 const ContactUs = () => {
@@ -7,6 +7,33 @@ const ContactUs = () => {
   const stepwiseRef = useRef(null);
   const featuresRef = useRef(null);
   const benefitsRef = useRef(null);
+
+  // State for form fields
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  // Function to handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Format the message for WhatsApp
+    const whatsappMessage = `*New Contact from FinYearPro*%0A
+*Name:* ${name}%0A
+*Email:* ${email}%0A
+*Message:* ${message}%0A`;
+    
+    // Create WhatsApp link with formatted message
+    const whatsappUrl = `https://wa.me/919063583262?text=${whatsappMessage}`;
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, '_blank');
+    
+    // Reset form
+    setName('');
+    setEmail('');
+    setMessage('');
+  };
 
   return (
     <>
@@ -40,10 +67,10 @@ const ContactUs = () => {
                   Responsible for application architecture, backend development, and system integration.
                 </p>
                 <div className="flex justify-center space-x-4">
-                  <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+                  <a href="https://www.linkedin.com/in/yashwanthk872/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
                     <i className="fab fa-linkedin text-xl"></i>
                   </a>
-                  <a href="https://github.com/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
+                  <a href="https://github.com/yashwanthk8" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-black">
                     <i className="fab fa-github text-xl"></i>
                   </a>
                   <a href="mailto:yashwanthk872@gmail.com" className="text-red-500 hover:text-red-700">
@@ -122,7 +149,7 @@ const ContactUs = () => {
                 </p>
                 <p className="flex items-center text-gray-600">
                   <i className="fas fa-map-marker-alt mr-3 text-blue-600"></i>
-                  Hyderabad, Telangana, India
+                  Kurnool, Andhra Pradesh, India
                 </p>
                 
                 <div className="mt-6">
@@ -143,7 +170,7 @@ const ContactUs = () => {
               
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Send us a message</h3>
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className="mb-4">
                     <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-2">Name</label>
                     <input 
@@ -151,6 +178,9 @@ const ContactUs = () => {
                       id="name" 
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
                       placeholder="Your name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="mb-4">
@@ -160,6 +190,9 @@ const ContactUs = () => {
                       id="email" 
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
                       placeholder="Your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="mb-4">
@@ -169,13 +202,16 @@ const ContactUs = () => {
                       rows="4" 
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
                       placeholder="Your message"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      required
                     ></textarea>
                   </div>
                   <button 
                     type="submit" 
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    Send Message
+                    Send to WhatsApp
                   </button>
                 </form>
               </div>

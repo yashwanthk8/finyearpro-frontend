@@ -13,7 +13,7 @@ let lastRequestTime = Date.now();
 /**
  * Check if we've hit the rate limit
  */
-function checkRateLimit() {
+function checkRateLimit() { 
   const now = Date.now();
   const timeSinceLastRequest = now - lastRequestTime;
   

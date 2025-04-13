@@ -79,7 +79,7 @@ const FileUpload = mongoose.model('FileUpload', fileUploadSchema);
 // Enable CORS
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',') 
-    : ['https://dataanalyse.netlify.app', 'http://localhost:5173'];
+    : ['https://aidatavista.netlify.app', 'http://localhost:5173'];
 
 app.use(cors({
     origin: function(origin, callback) {
